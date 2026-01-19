@@ -206,15 +206,17 @@ python embeddings/vector_search.py
 
 ## 🧠 Key Technologies Used
 
-* Python
-* SQLite
-* Pandas
-* Requests
-* BeautifulSoup
-* FastAPI
-* SentenceTransformers
-* Scikit-learn
-* Git & GitHub
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)
+![Requests](https://img.shields.io/badge/Requests-000000?style=flat-square)
+![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-59666C?style=flat-square)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![SentenceTransformers](https://img.shields.io/badge/SentenceTransformers-FF6F00?style=flat-square)
+![Scikit--learn](https://img.shields.io/badge/Scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)
+
 
 ---
 
