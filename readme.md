@@ -1,11 +1,3 @@
-Below is a **clean, professional, copy-paste-ready `README.md`** written for **academic submission + GitHub review**.
-It clearly explains **what was done**, shows the **pipeline**, cites the **data source**, and includes the **contributors exactly as you asked**.
-
-You can **copy everything as-is** and paste it into `README.md`.
-
----
-
-```markdown
 # Faculty Semantic Search Data Pipeline
 
 ## 📌 Project Overview
@@ -38,8 +30,7 @@ https://www.daiict.ac.in/faculty
 ---
 
 ## 🧱 Data Pipeline Architecture
-
-project/pipeline bde.png
+<img width="5764" height="838" alt="pipeline bde" src="https://github.com/user-attachments/assets/cbbb84aa-f006-4ce1-9571-6a01b14013bf" />
 
 ---
 
@@ -260,21 +251,5 @@ Faculty data source:
 
 This project is intended for **academic use only**.
 
-```
 
----
 
-### ✅ What this README is good for
-- ✔ College submission  
-- ✔ Viva / evaluation  
-- ✔ GitHub project review  
-- ✔ Clear pipeline explanation  
-
-If you want, I can:
-- Shorten this for **exam PDF**
-- Add **architecture diagram caption**
-- Convert it into a **formal project report**
-- Write **problem statement & conclusion**
-
-Just tell me 👍
-```
