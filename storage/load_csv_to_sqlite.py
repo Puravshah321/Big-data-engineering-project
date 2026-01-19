@@ -1,0 +1,77 @@
+import sqlite3
+import pandas as pd
+import sys
+import os
+
+# -----------------------------
+# Fix import path
+# -----------------------------
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
+from transform.clean_text import clean_text
+
+# -----------------------------
+# Paths
+# -----------------------------
+CSV_PATH = os.path.join(BASE_DIR, "daiict_full_faculty_data.csv")
+DB_PATH = os.path.join(BASE_DIR, "storage", "faculty.db")
+
+# -----------------------------
+# Load CSV
+# -----------------------------
+df = pd.read_csv(CSV_PATH)
+
+# -----------------------------
+# Build semantic_text
+# -----------------------------
+df["semantic_text"] = (
+    df["Biography"].fillna("") + " " +
+    df["Research Interests"].fillna("") + " " +
+    df["Publications"].fillna("")
+).apply(clean_text)
+
+# -----------------------------
+# Connect to SQLite
+# -----------------------------
+conn = sqlite3.connect(DB_PATH)
+cursor = conn.cursor()
+
+# -----------------------------
+# Insert data
+# -----------------------------
+for _, row in df.iterrows():
+    cursor.execute(
+        """
+        INSERT INTO Faculty (name, email, profile_url, qualification, semantic_text)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            row["Name"],
+            row.get("Email"),
+            row.get("Profile URL"),
+            row.get("Qualification"),
+            row["semantic_text"]
+        )
+    )
+
+    faculty_id = cursor.lastrowid
+
+    # Insert Specialization as Research Tags
+    if pd.notna(row.get("Specialization")):
+        for tag in str(row["Specialization"]).split(","):
+            cursor.execute(
+                """
+                INSERT INTO Research_Tags (faculty_id, tag)
+                VALUES (?, ?)
+                """,
+                (faculty_id, tag.strip())
+            )
+
+# -----------------------------
+# Finalize
+# -----------------------------
+conn.commit()
+conn.close()
+
+print("✅ CSV data successfully loaded into storage/faculty.db")
