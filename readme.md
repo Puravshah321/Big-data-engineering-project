@@ -238,7 +238,7 @@ This project demonstrates:
 Faculty data source:
 
 > DA-IICT Faculty Directory
-> [https://www.daiict.ac.in/faculty](https://www.daiict.ac.in/faculty)
+> [https://www.daiict.ac.in/faculty](https://www.daiict.ac.in/)
 
 ---
 
