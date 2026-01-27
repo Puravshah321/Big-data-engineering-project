@@ -113,7 +113,7 @@ for URL in URLS:
         address = address.text.strip() if address else "N/A"
 
         # Email
-        email = faculty.find(class_="facultyEmail")
+        email = faculty.find(class_="facultyemail")
         email = email.text.strip() if email else "N/A"
 
         # Specialization
@@ -157,6 +157,6 @@ for URL in URLS:
 # Save CSV
 # -------------------------
 df = pd.DataFrame(faculty_list)
-df.to_csv("daiict_full_faculty_data.csv", index=False)
+df.to_csv("dau_full_faculty_data.csv", index=False)
 
 print("\n✅ DONE! Total faculty scraped:", len(faculty_list))
