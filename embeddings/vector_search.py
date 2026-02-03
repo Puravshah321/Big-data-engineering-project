@@ -47,12 +47,19 @@ class FacultyVectorSearch:
 
         texts = []
         for r in rows:
-            if r[1] and len(r[1].strip()) > 0:
+            # Check for valid text content
+            content = r[1]
+            if content and len(content.strip()) > 0:
                 self.faculty_ids.append(r[0])
-                texts.append(r[1])
+                
+                # Truncate to first 500 chars to save model tokenization memory
+                # (Model only looks at first ~256 tokens anyway)
+                truncated_text = content[:500].strip()
+                texts.append(truncated_text)
+                
                 self.raw_data.append({
                     "id": r[0],
-                    "text": r[1].lower(),
+                    "text": truncated_text.lower(),
                     "name": r[2].lower(),
                     "qual": r[3].lower() if r[3] else "",
                 })
