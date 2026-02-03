@@ -110,37 +110,30 @@ embeddings/vector_search.py
 
 ---
 
-### 5️⃣ Semantic Search Engine
-- Converts user queries into embeddings
-- Uses **cosine similarity** to rank faculty profiles
-- Enables meaning-based retrieval rather than keyword matching
+### 5️⃣ Semantic Search Engine (Hybrid)
+- **Hybrid Search Strategy**: Combines **cosine similarity** (vector search) with **keyword boosting**.
+  - Matches exact names (+50% score)
+  - Matches exact phrases in bio (+20% score)
+  - Boosts based on term overlap
+- Uses `all-mpnet-base-v2` for high-quality embeddings.
 
-Example queries:
-- *machine learning faculty*
-- *wireless networks*
-- *computer vision research*
+### 6️⃣ Frontend (React + Vite)
+- Modern UI built with **React** and **Tailwind CSS**.
+- Features:
+  - Real-time semantic search
+  - Faculty result cards with images
+  - Responsive design with smooth animations (`framer-motion`)
 
----
-
-### 6️⃣ API Layer (FastAPI)
+### 7️⃣ API Layer (FastAPI)
 The backend exposes the following REST endpoints:
 
 - `/faculty` – Retrieve all faculty records  
 - `/faculty/{id}` – Retrieve a faculty record by ID  
-- `/semantic-search?q=` – Perform semantic search  
-
-Swagger UI available at:
-```
-
-[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
-```
+- `/semantic-search?q=` – Perform hybrid semantic search  
 
 📂 Implemented in:
 ```
-
 main.py
-
 ```
 
 ---
@@ -244,6 +237,29 @@ Faculty data source:
 
 * **Purav Shah** — 202518020
 * **Jay Salot** — 202518029
+
+---
+
+
+---
+
+## 🚀 Deployment (Render)
+
+This project is configured to auto-deploy on Render.com.
+
+1. **Push to GitHub**
+   Ensure your code (including `render.yaml`) is pushed to your repository.
+
+2. **Deploy on Render**
+   - Go to [dashboard.render.com](https://dashboard.render.com/)
+   - Click **New +** -> **Blueprint**
+   - Connect your GitHub repository
+   - Render will read the `render.yaml` and create two services:
+     - **Backend**: Hosted Python/FastAPI service
+     - **Frontend**: Hosted Static Site (React/Vite)
+
+3. **Enjoy!**
+   Your app will be live on the URL provided by Render.
 
 ---
 

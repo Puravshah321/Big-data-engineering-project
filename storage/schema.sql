@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS Faculty (
     name TEXT NOT NULL,
     email TEXT,
     profile_url TEXT,
+    image_url TEXT,
     qualification TEXT,
     semantic_text TEXT NOT NULL
 );

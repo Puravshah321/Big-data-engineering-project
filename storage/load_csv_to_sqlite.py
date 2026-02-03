@@ -12,6 +12,11 @@ sys.path.append(BASE_DIR)
 from transform.clean_text import clean_text
 
 # -----------------------------
+# Constants
+# -----------------------------
+BASE_URL = "https://www.daiict.ac.in"
+
+# -----------------------------
 # Paths
 # -----------------------------
 CSV_PATH = os.path.join(BASE_DIR, "daiict_full_faculty_data.csv")
@@ -40,16 +45,31 @@ cursor = conn.cursor()
 # -----------------------------
 # Insert data
 # -----------------------------
+# Clear existing data to avoid duplicates
+cursor.execute("DELETE FROM Research_Tags")
+cursor.execute("DELETE FROM Faculty")
+# Reset Auto Increment
+cursor.execute("DELETE FROM sqlite_sequence WHERE name='Faculty'")
+cursor.execute("DELETE FROM sqlite_sequence WHERE name='Research_Tags'")
+
 for _, row in df.iterrows():
+    # Process Image URL
+    image_url = row.get("Image URL")
+    if pd.isna(image_url) or image_url == "N/A":
+        image_url = None
+    elif str(image_url).startswith("/"):
+        image_url = BASE_URL + str(image_url)
+
     cursor.execute(
         """
-        INSERT INTO Faculty (name, email, profile_url, qualification, semantic_text)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO Faculty (name, email, profile_url, image_url, qualification, semantic_text)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
         (
             row["Name"],
             row.get("Email"),
             row.get("Profile URL"),
+            image_url,
             row.get("Qualification"),
             row["semantic_text"]
         )

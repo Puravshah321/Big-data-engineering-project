@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: faculty-search-backend
+    env: python
+    buildCommand: pip install -r requirements.txt && python storage/load_csv_to_sqlite.py
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  - type: web
+    name: faculty-search-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+            type: web
+            name: faculty-search-backend
+            property: host

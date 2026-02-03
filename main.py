@@ -7,6 +7,16 @@ import os
 # -----------------------------
 app = FastAPI(title="Faculty Semantic Search API")
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # -----------------------------
 # Absolute DB path
 # -----------------------------
@@ -66,7 +76,7 @@ def semantic_search(
 
     for faculty_id, score in results:
         row = conn.execute(
-            "SELECT id, name, email, qualification FROM Faculty WHERE id = ?",
+            "SELECT id, name, email, qualification, profile_url, image_url FROM Faculty WHERE id = ?",
             (faculty_id,)
         ).fetchone()
 

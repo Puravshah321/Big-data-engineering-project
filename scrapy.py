@@ -159,4 +159,4 @@ for URL in URLS:
 df = pd.DataFrame(faculty_list)
 df.to_csv("dau_full_faculty_data.csv", index=False)
 
-print("\n✅ DONE! Total faculty scraped:", len(faculty_list))
+print("\nDONE! Total faculty scraped:", len(faculty_list))

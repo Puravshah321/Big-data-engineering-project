@@ -1,0 +1,1 @@
+['id', 'name', 'email', 'profile_url', 'qualification', 'semantic_text']
