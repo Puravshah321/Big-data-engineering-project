@@ -133,10 +133,10 @@ def semantic_search(
     top_k: int = 5
 ):
     if semantic_engine is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Search engine warming up, try again shortly"
-        )
+        detail = "Search engine is still warming up (AI model loading). Please try again in 1-2 minutes."
+        if getattr(app.state, "engine_error", None):
+            detail = f"Search engine failed to load: {app.state.engine_error}"
+        raise HTTPException(status_code=503, detail=detail)
 
     results = semantic_engine.search(q, top_k)
 

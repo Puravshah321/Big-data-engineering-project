@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Loader2, User, Mail, GraduationCap, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, Loader2, User, Mail, GraduationCap, ChevronRight, Sparkles, AlertCircle } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -25,6 +25,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -32,13 +33,17 @@ function App() {
 
     setLoading(true);
     setSearched(true);
+    setError(null);
     try {
       const response = await axios.get(`${API_URL}/semantic-search`, {
         params: { q: query, top_k: 9 }
       });
       setResults(response.data);
-    } catch (error) {
-      console.error("Search failed:", error);
+    } catch (err) {
+      console.error("Search failed:", err);
+      const msg = err.response?.data?.detail || "Search failed. Please try again.";
+      setError(msg);
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -50,7 +55,7 @@ function App() {
       {/* Navbar */}
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => { setSearched(false); setQuery(''); }}>
+          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => { setSearched(false); setQuery(''); setError(null); }}>
             <div className="bg-primary/10 p-2 rounded-lg">
               <Sparkles className="h-6 w-6 text-primary" />
             </div>
@@ -119,7 +124,21 @@ function App() {
 
         {/* Results Section */}
         <div className="flex-1 w-full">
-          {searched && !loading && results.length === 0 && (
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start space-x-3 text-amber-800"
+            >
+              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-sm">Update from backend:</h4>
+                <p className="text-sm opacity-90">{error}</p>
+              </div>
+            </motion.div>
+          )}
+
+          {searched && !loading && !error && results.length === 0 && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
