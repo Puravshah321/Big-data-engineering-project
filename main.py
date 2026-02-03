@@ -49,13 +49,16 @@ async def startup_event():
 
     def load_engine():
         global semantic_engine
-        time.sleep(3) # Wait for uvicorn to be fully ready
+        import gc
+        time.sleep(5) # Give uvicorn more time to breathe
         print("DEBUG: Starting background engine initialization...")
         try:
+            gc.collect()
             from embeddings.vector_search import FacultyVectorSearch
             print(f"DEBUG: Importing FacultyVectorSearch success.")
             
             engine = FacultyVectorSearch()
+            gc.collect()
             print(f"DEBUG: Initialized FacultyVectorSearch class.")
             
             engine.load_data()
