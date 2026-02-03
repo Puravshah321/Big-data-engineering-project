@@ -69,12 +69,14 @@ async def startup_event():
             
             semantic_engine = engine
             print("✅ SUCCESS: Semantic engine is fully ready.")
+        except ImportError as ie:
+            print(f"❌ IMPORT FAILURE: {ie}")
+            app.state.engine_error = f"Import error: {str(ie)}"
         except Exception as e:
             import traceback
             error_details = traceback.format_exc()
             print("❌ FATAL: Semantic engine failed to load:")
             print(error_details)
-            # Store the error so we can see it in health check
             app.state.engine_error = str(e)
 
     app.state.engine_error = None
