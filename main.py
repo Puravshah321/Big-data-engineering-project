@@ -49,7 +49,6 @@ async def startup_event():
 
     def load_engine():
         global semantic_engine
-        # Small delay to ensure process has bound to the port safely
         time.sleep(2)
         print("Initializing semantic engine in background thread...")
         try:
@@ -57,7 +56,11 @@ async def startup_event():
             engine = FacultyVectorSearch()
             engine.load_data()
             semantic_engine = engine
-            print("Semantic engine ready.")
+            # Get count for debugging
+            conn = get_db_connection()
+            count = conn.execute("SELECT COUNT(*) FROM Faculty").fetchone()[0]
+            conn.close()
+            print(f"Semantic engine ready. Loaded {count} faculty members.")
         except Exception as e:
             print("Error loading semantic engine:", e)
 
@@ -65,11 +68,27 @@ async def startup_event():
     thread.start()
 
 # -----------------------------
-# Healthcheck (Simplified)
+# Healthcheck (Detailed)
 # -----------------------------
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    stats = {
+        "status": "ok",
+        "engine_ready": semantic_engine is not None,
+        "db_exists": os.path.exists(DB_PATH),
+    }
+    if semantic_engine:
+        stats["records_loaded"] = len(semantic_engine.faculty_ids)
+    
+    # Try a live DB count
+    try:
+        conn = get_db_connection()
+        stats["db_count"] = conn.execute("SELECT COUNT(*) FROM Faculty").fetchone()[0]
+        conn.close()
+    except:
+        stats["db_count"] = "error"
+        
+    return stats
 
 # -----------------------------
 # API Routes
