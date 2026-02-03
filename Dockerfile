@@ -44,5 +44,5 @@ COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 # Expose port (Railway will map PORT dynamically)
 EXPOSE 8080
 
-# IMPORTANT: shell form so $PORT expands correctly
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
+# Start uvicorn
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
