@@ -16,7 +16,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "storage", "faculty.db")
 
-MODEL_NAME = "all-mpnet-base-v2"  # Better accuracy than MiniLM
+MODEL_NAME = "all-MiniLM-L6-v2"  # Fast and small for cloud deployment
 
 class FacultyVectorSearch:
     def __init__(self):

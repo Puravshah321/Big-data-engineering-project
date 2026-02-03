@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 import sqlite3
 import os
+import threading
 
 # -----------------------------
 # App
@@ -64,11 +65,20 @@ semantic_engine = None
 
 @app.on_event("startup")
 async def startup_event():
-    global semantic_engine
-    print("Initializing semantic engine in background...")
-    semantic_engine = FacultyVectorSearch()
-    semantic_engine.load_data()
-    print("Semantic engine ready.")
+    def load_engine():
+        global semantic_engine
+        print("Initializing semantic engine in background thread...")
+        try:
+            engine = FacultyVectorSearch()
+            engine.load_data()
+            semantic_engine = engine
+            print("Semantic engine ready.")
+        except Exception as e:
+            print(f"Error loading semantic engine: {e}")
+
+    # Run the heavy loading in a separate thread so it doesn't block the health check
+    thread = threading.Thread(target=load_engine)
+    thread.start()
 
 @app.get("/health")
 def health_check():
