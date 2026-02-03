@@ -171,6 +171,10 @@ if os.path.exists(FRONTEND_DIST):
 
 @app.get("/{full_path:path}")
 async def serve_react_app(full_path: str):
+    # Ignore system paths
+    if full_path in ["docs", "redoc", "openapi.json"]:
+        return None # Let FastAPI handle these
+    
     file_path = os.path.join(FRONTEND_DIST, full_path)
 
     if os.path.exists(file_path) and os.path.isfile(file_path):
