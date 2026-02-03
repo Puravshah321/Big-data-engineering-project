@@ -59,8 +59,7 @@ def get_faculty_by_id(faculty_id: int):
 # -----------------------------
 # Semantic Search Integration
 # -----------------------------
-from embeddings.vector_search import FacultyVectorSearch
-
+# Moved import inside thread to prevent blocking startup
 semantic_engine = None
 
 @app.on_event("startup")
@@ -69,6 +68,8 @@ async def startup_event():
         global semantic_engine
         print("Initializing semantic engine in background thread...")
         try:
+            # Heavy import happens here now
+            from embeddings.vector_search import FacultyVectorSearch
             engine = FacultyVectorSearch()
             engine.load_data()
             semantic_engine = engine
@@ -79,6 +80,10 @@ async def startup_event():
     # Run the heavy loading in a separate thread so it doesn't block the health check
     thread = threading.Thread(target=load_engine)
     thread.start()
+
+@app.get("/")
+def root():
+    return {"message": "Faculty Search API is running", "health_check": "/health"}
 
 @app.get("/health")
 def health_check():
