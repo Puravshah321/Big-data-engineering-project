@@ -44,5 +44,11 @@ COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 # Expose port (Railway will map PORT dynamically)
 EXPOSE 8080
 
+# Optimization environment variables
+ENV TRANSFORMERS_OFFLINE=1
+ENV HF_DATASETS_OFFLINE=1
+ENV HF_HUB_OFFLINE=1
+ENV TORCH_DEVICE=cpu
+
 # Start uvicorn
 CMD uvicorn main:app --host 0.0.0.0 --port $PORT

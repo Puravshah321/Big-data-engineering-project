@@ -49,21 +49,32 @@ async def startup_event():
 
     def load_engine():
         global semantic_engine
-        time.sleep(2)
-        print("Initializing semantic engine in background thread...")
+        time.sleep(3) # Wait for uvicorn to be fully ready
+        print("DEBUG: Starting background engine initialization...")
         try:
             from embeddings.vector_search import FacultyVectorSearch
+            print(f"DEBUG: Importing FacultyVectorSearch success.")
+            
             engine = FacultyVectorSearch()
+            print(f"DEBUG: Initialized FacultyVectorSearch class.")
+            
             engine.load_data()
+            print(f"DEBUG: Data loaded successfully. Count: {len(engine.faculty_ids)}")
+            
+            if len(engine.faculty_ids) == 0:
+                print("WARNING: Vector search loaded 0 records. Check database table 'Faculty'.")
+            
             semantic_engine = engine
-            # Get count for debugging
-            conn = get_db_connection()
-            count = conn.execute("SELECT COUNT(*) FROM Faculty").fetchone()[0]
-            conn.close()
-            print(f"Semantic engine ready. Loaded {count} faculty members.")
+            print("✅ SUCCESS: Semantic engine is fully ready.")
         except Exception as e:
-            print("Error loading semantic engine:", e)
+            import traceback
+            error_details = traceback.format_exc()
+            print("❌ FATAL: Semantic engine failed to load:")
+            print(error_details)
+            # Store the error so we can see it in health check
+            app.state.engine_error = str(e)
 
+    app.state.engine_error = None
     thread = threading.Thread(target=load_engine, daemon=True)
     thread.start()
 
@@ -75,6 +86,7 @@ def health_check():
     stats = {
         "status": "ok",
         "engine_ready": semantic_engine is not None,
+        "engine_error": getattr(app.state, "engine_error", None),
         "db_exists": os.path.exists(DB_PATH),
     }
     if semantic_engine:
