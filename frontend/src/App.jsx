@@ -41,7 +41,18 @@ function App() {
       setResults(response.data);
     } catch (err) {
       console.error("Search failed:", err);
-      const msg = err.response?.data?.detail || "Search failed. Please try again.";
+      let msg = err.response?.data?.detail || "Search failed. Please try again.";
+
+      // If warming up, try to show stats from /health
+      if (err.response?.status === 503) {
+        try {
+          const health = await axios.get(`${API_URL}/health`);
+          if (health.data.db_count) {
+            msg += ` (Server sees ${health.data.db_count} database records)`;
+          }
+        } catch (hErr) { }
+      }
+
       setError(msg);
       setResults([]);
     } finally {

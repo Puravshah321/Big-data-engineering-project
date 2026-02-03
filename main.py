@@ -88,6 +88,8 @@ async def startup_event():
 def health_check():
     stats = {
         "status": "ok",
+        "version": "2.1",
+        "timestamp": time.time(),
         "engine_ready": semantic_engine is not None,
         "engine_error": getattr(app.state, "engine_error", None),
         "db_exists": os.path.exists(DB_PATH),
