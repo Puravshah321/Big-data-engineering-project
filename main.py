@@ -60,14 +60,28 @@ def get_faculty_by_id(faculty_id: int):
 # -----------------------------
 from embeddings.vector_search import FacultyVectorSearch
 
-semantic_engine = FacultyVectorSearch()
-semantic_engine.load_data()
+semantic_engine = None
+
+@app.on_event("startup")
+async def startup_event():
+    global semantic_engine
+    print("Initializing semantic engine in background...")
+    semantic_engine = FacultyVectorSearch()
+    semantic_engine.load_data()
+    print("Semantic engine ready.")
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "engine_ready": semantic_engine is not None}
 
 @app.get("/semantic-search")
 def semantic_search(
     q: str = Query(..., description="Search query"),
     top_k: int = 5
 ):
+    if semantic_engine is None:
+        return {"error": "Search engine is still initializing. Please try again in a few seconds."}
+    
     results = semantic_engine.search(q, top_k)
 
     # Convert faculty IDs to full records
