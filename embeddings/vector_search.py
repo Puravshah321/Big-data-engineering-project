@@ -7,8 +7,7 @@ Semantic search over faculty profiles using user queries.
 import sqlite3
 import os
 from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-
+import numpy as np
 
 # -----------------------------
 # Absolute DB path (IMPORTANT)
@@ -17,6 +16,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "storage", "faculty.db")
 
 MODEL_NAME = "all-MiniLM-L6-v2"  # Fast and small for cloud deployment
+
+def cosine_similarity_manual(v1, v2):
+    # v1 is [1, D], v2 is [N, D]
+    dot_product = np.dot(v1, v2.T)
+    norm_v1 = np.linalg.norm(v1, axis=1)
+    norm_v2 = np.linalg.norm(v2, axis=1)
+    return dot_product / (norm_v1 * norm_v2)
 
 class FacultyVectorSearch:
     def __init__(self):
@@ -55,8 +61,7 @@ class FacultyVectorSearch:
     def search(self, query: str, top_k: int = 5):
         query_embedding = self.model.encode([query])
         # Vector scores (Cosine Similarity)
-        # Result is [ [score1, score2, ...] ]
-        vector_scores = cosine_similarity(query_embedding, self.embeddings)[0]
+        vector_scores = cosine_similarity_manual(query_embedding, self.embeddings)[0]
 
         # Hybrid Scoring
         final_results = []
