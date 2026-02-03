@@ -87,3 +87,29 @@ def semantic_search(
 
     conn.close()
     return output
+
+# -----------------------------
+# Serve Frontend (SPA)
+# -----------------------------
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Mount the static directory
+# Ensure 'frontend/dist' exists (it will be populated in the Docker build or local build)
+if os.path.exists(os.path.join(BASE_DIR, "frontend", "dist")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(BASE_DIR, "frontend", "dist", "assets")), name="assets")
+
+# Catch-all route to serve index.html for any unmatched route (important for React Router/SPA)
+@app.get("/{full_path:path}")
+async def serve_react_app(full_path: str):
+    # If the path matches a file in dist (e.g. favicon.ico), serve it
+    dist_path = os.path.join(BASE_DIR, "frontend", "dist", full_path)
+    if os.path.exists(dist_path) and os.path.isfile(dist_path):
+        return FileResponse(dist_path)
+    
+    # Otherwise, serve index.html
+    index_path = os.path.join(BASE_DIR, "frontend", "dist", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    
+    return {"error": "Frontend not found. Did you run 'npm run build'?"}
