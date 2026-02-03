@@ -2,19 +2,23 @@
 vector_search.py
 ----------------
 Semantic search over faculty profiles optimized for Railway (500MB RAM).
+Uses pre-computed embeddings if available to save RAM/CPU on startup.
 """
 
 import sqlite3
 import os
 import gc
+import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 # -----------------------------
-# Absolute DB path
+# Absolute Paths
 # -----------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "storage", "faculty.db")
+EMBEDDINGS_PATH = os.path.join(BASE_DIR, "embeddings", "embeddings.npy")
+METADATA_PATH = os.path.join(BASE_DIR, "embeddings", "metadata.json")
 
 MODEL_NAME = "all-MiniLM-L6-v2"
 
@@ -36,9 +40,22 @@ class FacultyVectorSearch:
         self.raw_data = []
 
     def load_data(self):
+        # 1. Check if we have pre-computed embeddings
+        if os.path.exists(EMBEDDINGS_PATH) and os.path.exists(METADATA_PATH):
+            print(f"DEBUG: Loading PRE-COMPUTED embeddings from {EMBEDDINGS_PATH}...")
+            self.embeddings = np.load(EMBEDDINGS_PATH)
+            with open(METADATA_PATH, "r") as f:
+                meta = json.load(f)
+                self.faculty_ids = meta["ids"]
+                self.raw_data = meta["raw_data"]
+            print(f"✅ SUCCESS: Loaded {len(self.faculty_ids)} embeddings from disk.")
+            return
+
+        # 2. Fallback to manual encoding if files are missing
+        print("DEBUG: Pre-computed files not found. Falling back to manual encoding...")
         conn = sqlite3.connect(DB_PATH)
         rows = conn.execute(
-            "SELECT id, semantic_text, name, qualification, image_url FROM Faculty"
+            "SELECT id, semantic_text, name, qualification FROM Faculty"
         ).fetchall()
         conn.close()
 
@@ -47,16 +64,11 @@ class FacultyVectorSearch:
 
         texts = []
         for r in rows:
-            # Check for valid text content
             content = r[1]
             if content and len(content.strip()) > 0:
                 self.faculty_ids.append(r[0])
-                
-                # Truncate to first 500 chars to save model tokenization memory
-                # (Model only looks at first ~256 tokens anyway)
                 truncated_text = content[:500].strip()
                 texts.append(truncated_text)
-                
                 self.raw_data.append({
                     "id": r[0],
                     "text": truncated_text.lower(),
@@ -67,22 +79,16 @@ class FacultyVectorSearch:
         del rows
         gc.collect()
 
-        print(f"DEBUG: Encoding {len(texts)} records one-by-one to save RAM...")
-        # Pre-allocate float16 array
-        dim = 384 # Dimension for all-MiniLM-L6-v2
+        dim = 384
         self.embeddings = np.zeros((len(texts), dim), dtype=np.float16)
         
-        # Encode one by one to avoid large intermediate buffers
         for i, text in enumerate(texts):
-            # Encode single text, convert to f16 immediately
             vec = self.model.encode([text], show_progress_bar=False, convert_to_numpy=True)
             self.embeddings[i] = vec[0].astype(np.float16)
-            if i % 20 == 0:
-                print(f"DEBUG: Encoded {i}/{len(texts)}...")
         
         del texts
         gc.collect()
-        print("DEBUG: Encoding complete. Memory cleared.")
+        print("DEBUG: Encoding complete.")
 
     def search(self, query: str, top_k: int = 5):
         if self.embeddings is None:
