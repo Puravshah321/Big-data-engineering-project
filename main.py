@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 import sqlite3
 import os
 import threading
+import time
 
 # -----------------------------
 # App
@@ -48,8 +49,10 @@ async def startup_event():
 
     def load_engine():
         global semantic_engine
+        # Small delay to ensure process has bound to the port safely
+        time.sleep(2)
+        print("Initializing semantic engine in background thread...")
         try:
-            print("Initializing semantic engine in background thread...")
             from embeddings.vector_search import FacultyVectorSearch
             engine = FacultyVectorSearch()
             engine.load_data()
@@ -62,14 +65,11 @@ async def startup_event():
     thread.start()
 
 # -----------------------------
-# Healthcheck (CRITICAL)
+# Healthcheck (Simplified)
 # -----------------------------
-@app.get("/health", include_in_schema=False)
+@app.get("/health")
 def health_check():
-    return {
-        "status": "ok",
-        "engine_ready": semantic_engine is not None
-    }
+    return {"status": "ok"}
 
 # -----------------------------
 # API Routes
