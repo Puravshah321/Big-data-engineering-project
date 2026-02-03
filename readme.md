@@ -19,6 +19,15 @@ This project is developed as part of a **Big Data Engineering (BDE)** academic a
 
 ---
 
+## 🚀 Live Demo (Railway)
+The project is fully deployed and available online:
+
+🔗 **Live URL:** [https://big-data-engineering-project-production.up.railway.app/](https://big-data-engineering-project-production.up.railway.app/)
+
+> Developed and deployed on **Railway.app** using a multi-stage Docker pipeline.
+
+---
+
 ## 🌐 Data Source
 Faculty data was scraped from the official DA-IICT faculty directory:
 
