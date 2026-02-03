@@ -74,12 +74,6 @@ def health_check():
 # -----------------------------
 # API Routes
 # -----------------------------
-@app.get("/")
-def root():
-    return {
-        "message": "Faculty Search API running",
-        "health": "/health"
-    }
 
 @app.get("/faculty")
 def get_all_faculty():
